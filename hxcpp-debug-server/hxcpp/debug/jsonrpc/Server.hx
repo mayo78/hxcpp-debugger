@@ -537,7 +537,9 @@ class Server {
 				references.clear();
 				stateMutex.release();
 
-				if (currentThreadInfo.status == cpp.vm.ThreadInfo.STATUS_STOPPED_BREAK_IMMEDIATE) {
+				if (currentThreadInfo == null) {
+					return;
+				} else if (currentThreadInfo.status == cpp.vm.ThreadInfo.STATUS_STOPPED_BREAK_IMMEDIATE) {
 					sendEvent(Protocol.PauseStop, {threadId: threadNumber});
 				} else if (currentThreadInfo.status == cpp.vm.ThreadInfo.STATUS_STOPPED_BREAKPOINT) {
 					var bId = currentThreadInfo.breakpoint;
