@@ -54,8 +54,20 @@ private class References {
 	}
 }
 
+typedef FunCrashInfo = {
+	var threadInfo:ThreadInfo;
+	var threadNumber:Int;
+	var event:Int;
+	var stackFrame:Int;
+	var className:String;
+	var functionName:String;
+	var fileName:String;
+	var lineNumber:Int;
+}
+
 @:keep
 class Server {
+	public var onCrash:FunCrashInfo->Void;
 	var host:String;
 	var port:Int;
 	var listening:sys.net.Socket;
@@ -559,6 +571,18 @@ class Server {
 					}
 					sendEvent(Protocol.BreakpointStop, {threadId: threadNumber});
 				} else {
+					if (onCrash != null) {
+						onCrash({
+							threadInfo: currentThreadInfo,
+							threadNumber: threadNumber,
+							event: event,
+							stackFrame: stackFrame,
+							className: className,
+							functionName: functionName,
+							fileName: fileName,
+							lineNumber: lineNumber,
+						});
+					}
 					sendEvent(Protocol.ExceptionStop, {text: currentThreadInfo.criticalErrorDescription});
 				}
 				// ThreadStopped(threadNumber, stackFrame, className,
